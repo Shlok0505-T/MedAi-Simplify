@@ -20,10 +20,4 @@
     "PYTHONPATH": "./",
     "MEDICAL_API_URL": "http://74.225.219.71/flow/99ecb228-9493-459d-ac2e-1aa0abe0ae48",
     "API_KEY": "sk-KoHDHZh68T9juZavQoTOgjDGx1Nn68TeWqe6AfEACvg"
-  },
-  "functions": {
-    "main.py": {
-      "maxDuration": 30
-    }
   }
-}
