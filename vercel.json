@@ -18,7 +18,7 @@
   ],
   "env": {
     "PYTHONPATH": "./",
-    "MEDICAL_API_URL": "http://localhost:7860/api/v1/run/1effbd4f-0774-486b-971c-6431bf605188?stream=false'",
+    "MEDICAL_API_URL": "http://74.225.219.71/flow/99ecb228-9493-459d-ac2e-1aa0abe0ae48",
     "API_KEY": "sk-KoHDHZh68T9juZavQoTOgjDGx1Nn68TeWqe6AfEACvg"
   },
   "functions": {
