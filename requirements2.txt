@@ -1,0 +1,20 @@
+# MedSimplify AI - FastAPI Version
+# Requirements file for FastAPI application
+
+# Core web framework
+fastapi>=0.104.1
+
+# ASGI server for production
+uvicorn[standard]>=0.24.0
+
+# Template engine for HTML rendering
+jinja2>=3.1.2
+
+# Forms handling
+python-multipart>=0.0.6
+
+# HTTP requests for API calls
+requests>=2.31.0
+
+# Optional: For enhanced functionality
+# python-dotenv>=1.0.0  # For .env file support (uncomment if needed)

@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedSimplify AI - Medical Text Simplification</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .main-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 2rem;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+            color: white;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.15);
+        }
+
+        .main-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .main-header p {
+            font-size: 1.2rem;
+            margin: 0.5rem 0 0 0;
+            opacity: 0.9;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 2rem;
+        }
+
+        .chat-section {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+            border: 1px solid #e2e8f0;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .section-header {
+            background: #ffffff;
+            padding: 1rem 1.5rem;
+            border-radius: 15px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            border: 1px solid #e2e8f0;
+            margin-bottom: 1rem;
+        }
+
+        .section-header h3 {
+            margin: 0;
+            color: #1e293b;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .chat-container {
+            max-height: 500px;
+            overflow-y: auto;
+            margin-bottom: 2rem;
+            padding-right: 0.5rem;
+        }
+
+        .message {
+            padding: 1.2rem 1.5rem;
+            border-radius: 18px;
+            margin: 1rem 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .user-message {
+            background: #f1f5f9;
+            border-left: 4px solid #667eea;
+        }
+
+        .assistant-message {
+            background: #fefefe;
+            border-left: 4px solid #764ba2;
+        }
+
+        .error-message {
+            background: #fef2f2;
+            color: #dc2626;
+            border-left: 4px solid #ef4444;
+            border: 1px solid #fecaca;
+        }
+
+        .message-badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+            color: white;
+        }
+
+        .doctor-badge {
+            background: #667eea;
+        }
+
+        .ai-badge {
+            background: #764ba2;
+        }
+
+        .error-badge {
+            background: #ef4444;
+        }
+
+        .timestamp {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-top: 0.5rem;
+            font-style: italic;
+        }
+
+        .input-area {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+            border: 1px solid #e2e8f0;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-end;
+        }
+
+        .text-input {
+            flex: 1;
+        }
+
+        .text-input textarea {
+            width: 100%;
+            background-color: #f8fafc;
+            color: #1e293b;
+            border: 2px solid #cbd5e1;
+            border-radius: 15px;
+            padding: 1rem;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .text-input textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+        }
+
+        .send-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25);
+            min-width: 120px;
+        }
+
+        .send-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.35);
+        }
+
+        .send-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .control-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .control-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.6rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .control-button:hover {
+            transform: translateY(-1px);
+        }
+
+        .metric-card {
+            background: #f8fafc;
+            padding: 1rem;
+            border-radius: 12px;
+            border-left: 3px solid #667eea;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-top: 0.5rem;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 1rem;
+            color: #667eea;
+        }
+
+        .spinner {
+            border: 2px solid #f3f4f6;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 0.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .footer {
+            text-align: center;
+            color: #64748b;
+            padding: 2rem;
+            margin-top: 2rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        @media (max-width: 768px) {
+            .layout {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 1rem;
+            }
+            
+            .main-header h1 {
+                font-size: 2rem;
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-header">
+            <h1>🩺 MedSimplify AI</h1>
+            <p>Medical Text Simplification Assistant</p>
+        </div>
+
+        <div class="layout">
+            <main class="chat-section">
+                <div class="section-header">
+                    <h3>💬 Medical Text Simplification</h3>
+                </div>
+
+                <div class="chat-container" id="chatContainer">
+                    <!-- Messages will be loaded here -->
+                </div>
+
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    Processing medical text...
+                </div>
+
+                <div class="input-area">
+                    <form id="simplifyForm">
+                        <div class="input-group">
+                            <div class="text-input">
+                                <textarea 
+                                    id="medicalText" 
+                                    name="text" 
+                                    placeholder="Enter complex medical text to simplify (e.g., 'The patient presents with acute myocardial infarction')..."
+                                    required
+                                ></textarea>
+                            </div>
+                            <button type="submit" class="send-button" id="sendButton">
+                                🔄 Simplify
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </main>
+
+            <aside class="sidebar">
+                <div class="section-header">
+                    <h3>🚀 Quick Actions</h3>
+                </div>
+                <div class="control-buttons">
+                    <button class="control-button" onclick="testConnection()">🔍 Test</button>
+                    <button class="control-button" onclick="clearChat()">🗑️ Clear</button>
+                </div>
+
+                <div class="section-header">
+                    <h3>📊 Session Stats</h3>
+                </div>
+                <div id="sessionStats">
+                    <div class="metric-card">
+                        <div class="metric-value" id="totalMessages">0</div>
+                        <div class="metric-label">Total Messages</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="textsProcessed">0</div>
+                        <div class="metric-label">Texts Processed</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="simplifications">0</div>
+                        <div class="metric-label">Simplifications</div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p><strong>MedSimplify AI</strong> - Medical Communication Assistant</p>
+        <p style="font-size: 0.8rem; margin-top: 1rem;">⚠️ This tool is for communication assistance only. Always verify medical accuracy.</p>
+    </div>
+
+    <script>
+        const sessionId = 'default-' + Date.now();
+        
+        // Load initial chat
+        loadChat();
+
+        // Form submission
+        document.getElementById('simplifyForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            formData.append('session_id', sessionId);
+            
+            const text = formData.get('text');
+            if (!text.trim()) return;
+
+            // Show loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('sendButton').disabled = true;
+
+            try {
+                const response = await fetch('/api/simplify', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // Clear input
+                    document.getElementById('medicalText').value = '';
+                    // Reload chat
+                    loadChat();
+                } else {
+                    alert('Error: ' + result.detail);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('sendButton').disabled = false;
+            }
+        });
+
+        async function loadChat() {
+            try {
+                const response = await fetch(`/api/chat/${sessionId}`);
+                const data = await response.json();
+
+                displayMessages(data.messages);
+                updateStats(data.session_stats);
+            } catch (error) {
+                console.error('Error loading chat:', error);
+            }
+        }
+
+        function displayMessages(messages) {
+            const container = document.getElementById('chatContainer');
+            container.innerHTML = '';
+
+            messages.forEach(message => {
+                const messageDiv = document.createElement('div');
+                
+                if (message.role === 'user') {
+                    messageDiv.className = 'message user-message';
+                    messageDiv.innerHTML = `
+                        <span class="message-badge doctor-badge">👨‍⚕️ MEDICAL TEXT</span>
+                        <div>${message.content}</div>
+                        <div class="timestamp">${message.timestamp}</div>
+                    `;
+                } else if (message.role === 'error') {
+                    messageDiv.className = 'message error-message';
+                    messageDiv.innerHTML = `
+                        <span class="message-badge error-badge">❌ ERROR</span>
+                        <div>${message.content}</div>
+                        <div class="timestamp">${message.timestamp}</div>
+                    `;
+                } else {
+                    messageDiv.className = 'message assistant-message';
+                    messageDiv.innerHTML = `
+                        <span class="message-badge ai-badge">🤖 SIMPLIFIED VERSION</span>
+                        <div>${message.content}</div>
+                        <div class="timestamp">${message.timestamp}</div>
+                    `;
+                }
+
+                container.appendChild(messageDiv);
+            });
+
+            // Scroll to bottom
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function updateStats(stats) {
+            document.getElementById('totalMessages').textContent = stats.total_messages;
+            document.getElementById('textsProcessed').textContent = stats.user_messages;
+            document.getElementById('simplifications').textContent = stats.ai_messages;
+        }
+
+        async function testConnection() {
+            try {
+                const response = await fetch('/api/test');
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('✅ Connection successful!');
+                } else {
+                    alert('❌ Connection failed: ' + result.message);
+                }
+            } catch (error) {
+                alert('❌ Connection failed: ' + error.message);
+            }
+        }
+
+        async function clearChat() {
+            try {
+                const response = await fetch(`/api/chat/${sessionId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    loadChat();
+                } else {
+                    alert('Error clearing chat');
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>
