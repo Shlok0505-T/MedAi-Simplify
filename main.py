@@ -30,7 +30,7 @@ async def simplify_text(
     """API endpoint to simplify medical text"""
     
     # Get API configuration from environment variables
-    api_url = os.getenv("MEDICAL_API_URL", "http://localhost:7860/api/v1/run/1effbd4f-0774-486b-971c-6431bf605188")
+    api_url = os.getenv("MEDICAL_API_URL", "http://74.225.219.71/api/v1/run/1effbd4f-0774-486b-971c-6431bf605188")
     api_key = os.getenv("API_KEY", "sk-KoHDHZh68T9juZavQoTOgjDGx1Nn68TeWqe6AfEACvg")
     
     # Initialize session if not exists
@@ -138,7 +138,7 @@ async def clear_chat(session_id: str):
 @app.get("/api/test")
 async def test_connection():
     """Test API connection"""
-    api_url = os.getenv("MEDICAL_API_URL", "http://localhost:7860/api/v1/run/1effbd4f-0774-486b-971c-6431bf605188")
+    api_url = os.getenv("MEDICAL_API_URL", "http://74.225.219.71/api/v1/run/1effbd4f-0774-486b-971c-6431bf605188")
     api_key = os.getenv("API_KEY", "sk-KoHDHZh68T9juZavQoTOgjDGx1Nn68TeWqe6AfEACvg")
     
     try:
